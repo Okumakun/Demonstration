@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Naux\Mail\SendCloudTemplate;
 
 class RegisterController extends Controller
 {
@@ -27,7 +29,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -62,10 +64,38 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user =  User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => null,
+            'avatar' => '/uploads/images/default.png',
             'password' => bcrypt($data['password']),
+            'confirmation_token' => str_random(40),
+            'api_token' => str_random(64),
+            'verify_code' => str_random(6)
         ]);
+        $this -> SendActiveLinkTo($user);
+        return $user;
     }
+
+
+    public function SendActiveLinkTo($user)
+    {
+        $data = [
+            'url' => route('verifyLink',['token' => $user -> confirmation_token]),
+            'name' => $user -> name,
+        ];
+        // 模板变量
+        $template = new SendCloudTemplate('app_account_register', $data);
+
+        Mail::raw($template, function ($message) use($user) {
+
+            $message->from('server@zhunkaopu.com', '准靠谱');
+
+            $message->to($user->email);
+        });
+    }
+
+
+
 }

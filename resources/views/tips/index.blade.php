@@ -14,8 +14,8 @@
                         <button class="btn btn-log btn-success"> 火速发布</button>
 
                     @else
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
+                        <a href="{{ route('login') }}">登录</a>
+                        <a href="{{ route('register') }}">注册</a>
                     @endauth
                 </div>
             @endif

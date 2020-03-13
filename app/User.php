@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -15,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'phone', 'avatar', 'password','confirmation_token','api_token','verify_code','settings'
     ];
 
     /**
@@ -23,6 +24,9 @@ class User extends Authenticatable
      *
      * @var array
      */
+    protected $casts = [
+        'settings' => array()
+    ];
     protected $hidden = [
         'password', 'remember_token',
     ];
@@ -32,5 +36,10 @@ class User extends Authenticatable
         return $this->hasMany(Tip::class);
     }
 
+
+    public function owns(Model $model)
+    {
+         return $this->id === $model->user_id;
+    }
 
 }
